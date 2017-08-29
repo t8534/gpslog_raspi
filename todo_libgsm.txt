@@ -1,0 +1,12 @@
+TODO libgsm
+
+1.
+Ublock 6 send correct messages with 38400 speed.
+Tested, see ublock6.txt log.
+
+This is ready to receive GPRM message.
+
+Compile position_logger.c example.
+
+Makefile updated, ready for compilation.
+
