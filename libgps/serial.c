@@ -16,7 +16,7 @@ void serial_init(void)
 
     if (uart0_filestream == -1)
     {
-        //TODO error handling...
+        printf("Serial: Error when open serial port \n");
     }
 }
 
@@ -24,12 +24,16 @@ void serial_config(void)
 {
     struct termios options;
     tcgetattr(uart0_filestream, &options);
-    options.c_cflag = B9600 | CS8 | CLOCAL | CREAD;
-    options.c_iflag = IGNPAR;
+    //options.c_cflag = B9600 | CS8 | CLOCAL | CREAD;
+    options.c_cflag = B38400 | CS8 | CLOCAL | CREAD;
+    options.c_iflag = IGNPAR;  // Ignore bytes with parity error.
     options.c_oflag = 0;
     options.c_lflag = 0;
     tcflush(uart0_filestream, TCIFLUSH);
     tcsetattr(uart0_filestream, TCSANOW, &options);
+
+    //usleep(10000);  // 10ms (from wiringPi)
+
 }
 
 void serial_println(const char *line, int len)
@@ -42,7 +46,7 @@ void serial_println(const char *line, int len)
 
         int count = write(uart0_filestream, cpstr, len+1);
         if (count < 0) {
-            //TODO: handle errors...
+        	printf("Serial: Error when write to serial port \n");
         }
         free(cpstr);
     }
@@ -50,7 +54,7 @@ void serial_println(const char *line, int len)
 
 // Read a line from UART.
 // Return a 0 len string in case of problems with UART
-void serial_readln(char *buffer, int len)
+void serial_readln(char *buffer, int len)  // Bug, len is never returned, this is not a pointer, infinity loop - no timeout.
 {
     char c;
     char *b = buffer;
@@ -60,7 +64,7 @@ void serial_readln(char *buffer, int len)
 
         if (rx_length <= 0) {
             //wait for messages
-            sleep(1);
+            sleep(1);  // could be too short.
         } else {
             if (c == '\n') {
                 *b++ = '\0';
