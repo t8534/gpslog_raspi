@@ -1,5 +1,6 @@
 /**
  * @author  Tilen Majerle
+
  * @email  tilen@majerle.eu
  * @website http://stm32f4-discovery.com
  * @link    http://stm32f4-discovery.com/2014/08/library-27-gps-stm32f4-devices/
@@ -26,6 +27,18 @@
    ----------------------------------------------------------------------
 @endverbatim
  */
+
+
+/* TODO:
+ * 1.
+ * Update comment related to USART usage, replace with Ring Buffer usage.
+ *
+ *
+ *
+ *
+ *
+ */
+
 #ifndef TM_GPS_H
 #define TM_GPS_H 130
 /**
@@ -144,6 +157,8 @@
  - math.h
 @endverbatim
  */
+
+//TODO: update
 #include "stm32f4xx.h"
 #include "stm32f4xx_rcc.h"
 #include "tm_stm32f4_usart.h"
@@ -153,31 +168,24 @@
 #include "stdlib.h"
 #include "string.h"
 
+#include "ring_buffer.h"
+
 /**
  * @defgroup TM_GPS_Macros
  * @brief    Library private defines without any sense for USER
  * @{
  */
 
-/* Default GPS USART used */
-#ifndef GPS_USART
-#define GPS_USART                   USART1
-#define GPS_USART_PINSPACK          TM_USART_PinsPack_2
+
+/* Checks if Ring Buffer for GPS is empty */
+#ifndef GPS_RING_BUFFER_EMPTY
+#define GPS_RING_BUFFER_EMPTY      RB_IsBufferEmpty()
 #endif
 
-/* Checks if USART buffer for GPS is empty */
-#ifndef GPS_USART_BUFFER_EMPTY
-#define GPS_USART_BUFFER_EMPTY      TM_USART_BufferEmpty(GPS_USART)
-#endif
-
-/* Get character from USART buffer for GPS */
-#ifndef GPS_USART_BUFFER_GET_CHAR
-#define GPS_USART_BUFFER_GET_CHAR   TM_USART_Getc(GPS_USART)
-#endif
-
-/* Init function for GPS */
-#ifndef GPS_USART_INIT
-#define GPS_USART_INIT(baudrate)    TM_USART_Init(GPS_USART, GPS_USART_PINSPACK, baudrate)
+/* Get character from Ring Buffer for GPS */
+#ifndef GPS_RING_BUFFER_GET_CHAR
+//#define GPS_USART_BUFFER_GET_CHAR   TM_USART_Getc(GPS_USART)
+#define GPS_RING_BUFFER_GET_CHAR    RB_GetByte()
 #endif
 
 /* Maximum number of custom GPGxx values */

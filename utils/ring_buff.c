@@ -31,6 +31,9 @@ void RB_DeInit()
 
 }
 
+#if 0
+//TODO: This function is better then without check result.
+//      If get byte from empty buffer it return 0, so the check for result is necessary.
 //TODO: Add CRITICAL_SECTION
 //
 // Result: Return FALSE if Buffer empty, or byte in parameter and TRUE.
@@ -52,6 +55,38 @@ bool_t RB_GetByte(uint8_t* val)
 
 	return res;
 }
+#endif
+
+
+
+//TODO: This is original function to cooperate with gps lib.
+//      This function is danger because return 0 if buffer was empty.
+//      Replace it with version above.
+//
+//
+//TODO: Add CRITICAL_SECTION
+//
+// Result: Return 0 even if buffer empty, check is buffer not empty before call !
+uint8_t RB_GetByte()
+{
+	uint8_t c = 0; // ! If nothing in the buffer 0 will be returned.
+
+	/* Check if we have any data in buffer */
+	if (u->Num > 0) {
+		if (u->Out == u->Size) {
+			u->Out = 0;
+		}
+		c = *(u->Buffer + u->Out);
+		u->Out++;
+		u->Num--;
+	}
+
+	return c;
+}
+
+
+
+
 
 
 //TODO: Add CRITICAL_SECTION

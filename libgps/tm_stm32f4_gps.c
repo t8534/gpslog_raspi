@@ -16,6 +16,27 @@
  * | along with this program.  If not, see <http://www.gnu.org/licenses/>.
  * |----------------------------------------------------------------------
  */
+
+
+/* TODO:
+ *
+ * 1.
+ * gps lib should be not coupled with uart.
+ *
+ * 2.
+ * There should be not init uart from gps lib.
+ *
+ * 3.
+ * The interface to uart should be get char from buffer.
+ *
+ *
+ *
+ *
+ *
+ *
+ *
+ */
+
 #include "tm_stm32f4_gps.h"
 
 static char GPS_Term[15];
@@ -54,8 +75,6 @@ void TM_GPS_INT_CheckEmpty(TM_GPS_t* GPS_Data);
 
 /* Public */
 void TM_GPS_Init(TM_GPS_t* GPS_Data, uint32_t baudrate) {
-	/* Initialize USART */
-	GPS_USART_INIT(baudrate);
 	/* Set first-time variable */
 	TM_GPS_FirstTime = 1;
 	/* Clear all flags */
@@ -92,12 +111,12 @@ void TM_GPS_Init(TM_GPS_t* GPS_Data, uint32_t baudrate) {
 }
 
 TM_GPS_Result_t TM_GPS_Update(TM_GPS_t* GPS_Data) {
-	/* Check for data in USART */
-	if (!GPS_USART_BUFFER_EMPTY) {
+	/* Check for data in Ring Buffer */
+	if (!GPS_RING_BUFFER_EMPTY) {
 		/* Go through all buffer */
-		while (!GPS_USART_BUFFER_EMPTY) {
+		while (!GPS_RING_BUFFER_EMPTY) {
 			/* Do character by character */
-			TM_GPS_INT_Do(GPS_Data, (char)GPS_USART_BUFFER_GET_CHAR);
+			TM_GPS_INT_Do(GPS_Data, (char)GPS_RING_BUFFER_GET_CHAR);
 			/* If new data available, return to user */
 			if (GPS_Data->Status == TM_GPS_Result_NewData) {
 				return GPS_Data->Status;
