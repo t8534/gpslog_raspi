@@ -1,0 +1,30 @@
+TODO:
+
+1.
+Add GetMessage module.
+It read data from Ring Buffer and collect NMEA message.
+It could check is crc correct.
+It should pass first non valid bytes after initiation.
+It should be based on the state machine to detect first and last sign 
+of message.
+It should delivery NMEA Msg into parsers.
+
+2.
+Create MCAL serial and srial_raspi driver.
+
+3.
+Remove malloc from code.
+Check dynamic parsers upload.
+
+4.
+Change variable types to uintX_t.
+
+5.
+Compile it on the Raspi.
+
+6.
+If ready, move to STM uC.
+
+7.
+Make unit tests.
+
