@@ -15,6 +15,8 @@ Create MCAL serial and srial_raspi driver.
 3.
 Remove malloc from code.
 Check dynamic parsers upload.
+Check is any stdlib functions, like strcmp do not use malloc,
+and if any, replace it.
 
 4.
 Change variable types to uintX_t.
