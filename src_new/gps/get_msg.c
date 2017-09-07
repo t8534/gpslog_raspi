@@ -1,5 +1,6 @@
 
 //TODO:
+
 // 1.
 // Add kind of interface for input from ring buffer.
 // It could be struct represent interface, and than you can call a function from inside.
@@ -9,16 +10,15 @@
 // Add interface by vritual table when you read functions from listener.
 // It safe encapsulation if a function name will be changed inside of listener module.
 //
+// 3.
+// Add dynamic listeners.
+//
+
+#include "get_msg.h"
+
 
 #define MSG_BEGIN  '$'   // 0x24
 #define MSG_END    0x0A  //The end of message is <CR><LF>, so in practice this is <LF> hex: 0x0A
-
-
-#define MSG_BUFFER_LENGHT  2048
-typedef struct {
-  uint8_t buff[MSG_BUFFER_LENGHT];
-  uint8_t length;
-} MsgNMEA_t;
 
 
 typedef enum
@@ -38,18 +38,15 @@ typedef enum
 } MsgReceivingState_t;
 
 
-typedef enum
-{
-  OK,
-  ERR_NOT_OK,
-  ERR_BUFFER_OVERLOADED,
-} ErrStatus_t;
 
 
+// todo: make dynamic "add listeners" functionality
+//       In general, there could be separate class "listener"
 // Listeners
 #define LISTENERS_AMOUNT  1
 typedef void (*newMsgNotify)(MsgNMEA_t*)
 static newMsgNotify listeners[LISTENERS_NUMBER] = {};
+static uint16_t listenerIdx = 0;
 
 
 static Status_t status = IDLE;
@@ -58,12 +55,29 @@ MsgNMEA_t msgData;
 
 static RingBuffer *ringBuff;
 
+
+
+//todo: is functions below could be static ? So, in general is it possible
+//      to have a function static and get acceess to it by pointer from struct
+//      based pointer ? .If possible, remove RB_ prefix.
+//todo: is it possible to have static variable, and global pointer to her,
+//      and have an access via pointer ?
+GetMsg_if_t GetMsgObject = {
+  .Init = &GETMSG__Init;
+  .DeInit = &GETMSG__DeInit;
+  .Cyclic = &GETMSG__GetByte;
+  .AddListener = &GETMSG_AddListener;
+};
+GetMsg_if_t *GetMsgObj = &GetMsgObject;
+
+
 void GETMSG_Init(RingBuffer *rb);
 void GETMSG_DeInit(void);
 void GETMSG_Cyclic(void);
+GETMSG_ErrStatus_t GETMSG_AddListener(newMsgNotify *notifyFnc);
 
-static ErrStatus_t CollectingBytes(RingBuffer *rb);
-static ErrStatus_t ValidateMsg(MsgNMEA_t *msg);
+static GETMSG_ErrStatus_t CollectingBytes(RingBuffer *rb);
+static GETMSG_ErrStatus_t ValidateMsg(MsgNMEA_t *msg);
 
 
 void GETMSG_Init(RingBuffer *rb)
@@ -71,6 +85,15 @@ void GETMSG_Init(RingBuffer *rb)
   ringBuff = rb;
   status = INIT;
   msgParsingStatus = MSG_WAITING_FOR_BEGIN;
+
+  //todo: clean listeners table
+
+}
+
+
+void GETMSG_DeInit()
+{
+
 }
 
 
@@ -95,8 +118,19 @@ void GETMSG_Cyclic()
 }
 
 
+GETMSG_ErrStatus_t GETMSG_AddListener(newMsgNotify *notifyFnc)
+{
+	GETMSG_ErrStatus_t res = ERR_NOT_OK;
+  if
+
+
+
+}
+
+
+
 // Called periodically from GETMSG_Cyclic()
-ErrStatus_t CollectingBytes(RingBuffer *rb)
+static GETMSG_ErrStatus_t CollectingBytes(RBuff_if_t *rb)
 {
   uint8_t byte = 0;
   static uint16_t bufIdx = 0;
@@ -105,9 +139,9 @@ ErrStatus_t CollectingBytes(RingBuffer *rb)
   switch(msgParsingStatus)
   {
     case MSG_WAITING_FOR_BEGIN:
-      while(TRUE != rb->RB_IsBufferEmpty())
+      while(TRUE != rb->IsBufferEmpty())
       {
-        byte = rb->RB_GetByte();
+        byte = rb->GetByte();
         if (MSG_BEGIN != byte) continue;  // what about any timeout here, not necessary ?
         msgData.buff[bufIdx] = byte;
         bufIdx++;
@@ -117,9 +151,9 @@ ErrStatus_t CollectingBytes(RingBuffer *rb)
       break;
 
     case MSG_COLLECTING:
-      while(TRUE != rb->RB_IsBufferEmpty())  // what about any timeout here, not necessary ?
+      while(TRUE != rb->IsBufferEmpty())  // what about any timeout here, not necessary ?
       {                                  // what about if we not receiving end of msg and buff will be full.
-        byte = rb->RB_GetByte();
+        byte = rb->GetByte();
         msgData.buff[bufIdx] = byte;
         msgData.length++;
         bufIdx++;
@@ -133,7 +167,7 @@ ErrStatus_t CollectingBytes(RingBuffer *rb)
         {
           // The buffer is full and there was not end of message sign received,
           // clear all data and start again from beginning.
-          for (bufIdx = 0; bufIdx <= MSG_BUFFER_LENGHT)
+          for (bufIdx = 0; bufIdx < MSG_BUFFER_LENGHT)
           {
             msgData.buff[bufIdx] = 0;
           }
@@ -153,7 +187,7 @@ ErrStatus_t CollectingBytes(RingBuffer *rb)
           (*newMsgNotify[i])(msgData);
         }
 
-        for (bufIdx = 0; bufIdx <= MSG_BUFFER_LENGHT)
+        for (bufIdx = 0; bufIdx < MSG_BUFFER_LENGHT)
         {
           msgData.buff[bufIdx] = 0;
         }
@@ -173,9 +207,9 @@ ErrStatus_t CollectingBytes(RingBuffer *rb)
 }
 
 
-ErrStatus_t ValidateMsg(MsgNMEA_t* msg)
+static GETMSG_ErrStatus_t ValidateMsg(MsgNMEA_t* msg)
 {
-  ErrStatus_t res = OK;
+	GETMSG_ErrStatus_t res = OK;
 
 
 

@@ -1,5 +1,4 @@
-
-#include "hal_uart.h"
+#include "mcal_uart.h"
 #include "ring_buff.h"
 
 
@@ -17,5 +16,4 @@ void HAL_UART_IRQHandler(void) {
 		RB_PutByte(uint8_t c);
 	}
 }
-
 

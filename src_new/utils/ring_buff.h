@@ -1,23 +1,26 @@
+#ifndef RING_BUFF_H_
+#define RING_BUFF_H_
 
-//todo add ifded
-
-
+#include <stdint.h>
 
 //TODO: It should be optimized to use many RingBuffers, OOP.
 
 
-void RB_Init(void);
+//todo is this typedef could be moved to .c ?
+typedef struct
+{
+  void (*Init)(void);
+  void (*DeInit)(void);
+  uint8_t (*GetByte)(void);
+  bool_t (*PutByte)(uint8_t val);
+  bool_t (*IsBufferEmpty)(void);
+  bool_t (*IsBufferFull)(void);
+  void (*ClearBuffer)(void);
+} RBuff_if_t;
 
-void RB_DeInit(void);
 
-//bool_t RB_GetByte(uint8_t* val);
-uint8_t RB_GetByte();
+extern RBuff_if_t *RingBuffObj;
 
-bool_t RB_PutByte(uint8_t val);
 
-bool_t RB_IsBufferEmpty(void);
-
-bool_t RB_IsBufferFull(void);
-
-void RB_ClearBuffer(void);
+#endif /* RING_BUFF_H_ */
 

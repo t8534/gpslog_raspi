@@ -1,5 +1,6 @@
-
 #include "ring_buff.h"
+
+
 
 #define RB_BUFF_SIZE  1024
 static uint8_t buff[RB_BUFF_SIZE];
@@ -12,9 +13,30 @@ typedef struct {
 	uint16_t Out;
 } RB_RingBuffer_t;
 
+
+
+//todo: is RB_RingBuffer_t* u = &RB_RingBuff could be refactored ?
 static RB_RingBuffer_t RB_RingBuff;
 static RB_RingBuffer_t* u = &RB_RingBuff;  //TODO: refactoring, pointer because original code has functions
                                            // with pointer as an argument.
+
+//todo: is functions below could be static ? So, in general is it possible
+//      to have a function static and get acceess to it by pointer from struct
+//      based pointer ? .If possible, remove RB_ prefix.
+//todo: is it possible to have static variable, and global pointer to her,
+//      and have an access via pointer ?
+RBuff_if_t RingBuffer = {
+  .Init = &RB_Init;
+  .DeInit = &RB_DeInit;
+  .GetByte = &RB_GetByte;
+  .PutByte = &RB_PutByte;
+  .IsBufferEmpty = &RB_IsBufferEmpty;
+  .IsBufferFull = &RB_IsBufferFull;
+  .ClearBuffer = &RB_ClearBuffer;
+};
+
+RBuff_if_t *RingBuffObj = &RingBuffer;
+
 
 void RB_Init()
 {
@@ -83,9 +105,6 @@ uint8_t RB_GetByte()
 
 	return c;
 }
-
-
-
 
 
 

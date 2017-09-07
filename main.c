@@ -24,6 +24,25 @@
 // http://www.raspberry-projects.com/pi/programming-in-c/compilers-and-ides/geany/creating-a-project
 
 
+// PC tests
+
+#include <stdio.h>
+#include <stdint.h>
+#include "getmsg_tests.h"
+
+
+int main(int argc, char **argv)
+{
+	printf("Begin \n");
+	GETMSG_test();
+	printf("End \n");
+
+	//flush();
+	return 0;
+}
+
+
+
 #if 0
 #include <stdio.h>
 
@@ -36,6 +55,7 @@ int main(int argc, char **argv)
 #endif
 
 
+#if 0
 // serialRead test
 #include <stdio.h>
 #include <string.h>
@@ -66,6 +86,7 @@ int main ()
     fflush (stdout) ;
   }
 }
+#endif
 
 
 ////////////////////////////////////////////////
