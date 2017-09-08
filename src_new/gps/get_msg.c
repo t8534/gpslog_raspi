@@ -38,17 +38,6 @@ typedef enum
 } MsgReceivingState_t;
 
 
-
-
-// todo: make dynamic "add listeners" functionality
-//       In general, there could be separate class "listener"
-// Listeners
-#define LISTENERS_AMOUNT  1
-typedef void (*newMsgNotify)(MsgNMEA_t*)
-static newMsgNotify listeners[LISTENERS_NUMBER] = {};
-static uint16_t listenerIdx = 0;
-
-
 static Status_t status = IDLE;
 static MsgReceivingState_t msgParsingStatus = MSG_WAITING_FOR_BEGIN;
 MsgNMEA_t msgData;
