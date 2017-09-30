@@ -2,7 +2,61 @@
 #include "getmsg_tests.h"
 #include "get_msg.h"
 
+// Tests description.
+//
+// Create test phantom RingBuffer object and fill it with test bytes sentence.
+// The pointer to test RingBuffer is put into Get Message Init function.
+// In next step Get Message AddListener is called and newMsgNotify() is added
+// to the Listener. When message will be received this function will be called,
+// with NMEA message as a parameter. The message should be validated by Get Message
+// module before call newMsgNotify()
+// After notify about new message the code will be still in infinity loop
+// at GETMSG_test()
+// In order to start tests call GETMSG_test() for tests beginning.
+//
+// Test cases.
+// #1 One, correct sentence, match buffer length.
+// Sentence: "$GPGLL,4916.45,N,12311.12,W,225444,A\n\n"
+//
+// #2 Two correct sentences.
+// Sentence: "$GPGLL,4916.45,N,12311.12,W,225444,A\n\n$GPGLL,4916.45,N,12311.12,W,225444,A\n\n"
+//
+// #3 Five correct sentences, match buffer length.
+//
+// #4 Two correct sentences and random bytes between, outside of ascii, match ring buffer length.
+//
+// #4 Corrupted sentence with non ascii bytes inside, len correct.
+//
+// #5 Corrupted sentence, begin mark but in place of end mark another begin one,
+//    first sentence is smaller than should be.
+//
+// #6 Corrupted sentence, only begin and end mark.
+//
+// #7 Corrupted sentence, only begin, one ascci byte and end mark.
+//
+// #8 Corrupted sentence, only end mark.
+//
+// #9 Corrupted sentence, only begin mark.
+//
+// #10 Corrupted sentence, random bytes, match buffer length.
+//
+// #12 Corrupted sentence - wrong crc.
+
+
+
+
+
+
+
+
+
+// Test sentences
+static char sentence1[] = "$GPGLL,4916.45,N,12311.12,W,225444,A\n\n";
+
+
+/////////////////////////////////////////////////////////////////////
 // Ring buffer test implementation
+/////////////////////////////////////////////////////////////////////
 typedef struct
 {
   void (*Init)(void);
@@ -17,7 +71,6 @@ typedef struct
 static uint8_t TestRBuffGetByte();
 static bool_t TestRBuffIsBufferEmpty();
 static void TestRBuffClearBuffer();
-
 
 RBuff_if_t TestRingBuffer = {
   .Init = NULL;
@@ -34,10 +87,6 @@ RBuff_if_t *TestRingBuffObj = &TestRingBuffer;
 #define TEST_GETMSG_BUFFER_LEN  1024
 static buffer[TEST_GETMSG_BUFFER_LEN]
 static buffIdx = 0;
-
-static char sentence1[] = "$GPGLL,4916.45,N,12311.12,W,225444,A\n\n";
-
-
 
 
 static uint8_t TestRBuffGetByte()
@@ -72,6 +121,9 @@ static void TestRBuffClearBuffer()
 	buffIdx = 0;
 }
 
+/////////////////////////////////////////////////////////////////////
+
+
 
 // Get Msg notification.
 void newMsgNotify(MsgNMEA_t *msg)
@@ -100,22 +152,21 @@ void GETMSG_test()
 
 	printf("Parsing NMEA sentence: %s", sentence1);
 
-	GetMsgObj->Init(TestRingBuffObj);  // You have to put listeners list
 
-
-	// Add call to dynamic listener
-    res = resGetMsgObj->AddListener(newMsgNotify);
+	GETMSG_GetMsgObj->Init(TestRingBuffObj);
+    res = GETMSG_GetMsgObj->AddListener(newMsgNotify);
     if (OK != res)
     {
-    	printf("Error: NOT_OK, resGetMsgObj->AddListener(newMsgNotify) \n");
+    	printf("Error: not OK, GETMSG_GetMsgObj->AddListener(newMsgNotify) \n");
     	return;
     }
 
 	while(1)
     {
-		GetMsgObj->Cyclic();
+		GETMSG_GetMsgObj->Cyclic();
     }
 
-    GetMsgObj->DeInit();
+    GETMSG_GetMsgObj->DeInit();
 
 }
+

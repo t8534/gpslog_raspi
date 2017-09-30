@@ -2,6 +2,7 @@
 //TODO:
 
 // 1.
+
 // Add kind of interface for input from ring buffer.
 // It could be struct represent interface, and than you can call a function from inside.
 // It safe encapsulation if a function name will be changed inside of ring buffer module.
@@ -10,15 +11,14 @@
 // Add interface by vritual table when you read functions from listener.
 // It safe encapsulation if a function name will be changed inside of listener module.
 //
-// 3.
-// Add dynamic listeners.
 //
 
 #include "get_msg.h"
+#include "get_msg_listeners.h"
 
 
-#define MSG_BEGIN  '$'   // 0x24
-#define MSG_END    0x0A  //The end of message is <CR><LF>, so in practice this is <LF> hex: 0x0A
+#define GETMSG_MSG_BEGIN  '$'   // 0x24
+#define GETMSG_MSG_END    0x0A  //The end of message is <CR><LF>, so in practice this is <LF> hex: 0x0A
 
 
 typedef enum
@@ -27,7 +27,7 @@ typedef enum
   INIT,
   RUN,
   DEINIT,
-} Status_t;
+} GETMSG_Status_t;
 
 
 typedef enum
@@ -35,12 +35,12 @@ typedef enum
   MSG_WAITING_FOR_BEGIN,
   MSG_COLLECTING,
   MSG_RECEIVED,
-} MsgReceivingState_t;
+} GETMSG_MsgReceivingState_t;
 
 
-static Status_t status = IDLE;
-static MsgReceivingState_t msgParsingStatus = MSG_WAITING_FOR_BEGIN;
-MsgNMEA_t msgData;
+static GETMSG_Status_t status = IDLE;
+static GETMSG_MsgReceivingState_t msgParsingStatus = MSG_WAITING_FOR_BEGIN;
+MsgNMEA_t msgData;  //todo Is it static or/and pointer
 
 static RingBuffer *ringBuff;
 
@@ -51,42 +51,41 @@ static RingBuffer *ringBuff;
 //      based pointer ? .If possible, remove RB_ prefix.
 //todo: is it possible to have static variable, and global pointer to her,
 //      and have an access via pointer ?
-GetMsg_if_t GetMsgObject = {
-  .Init = &GETMSG__Init;
-  .DeInit = &GETMSG__DeInit;
-  .Cyclic = &GETMSG__GetByte;
-  .AddListener = &GETMSG_AddListener;
+GETMSG_GetMsg_if_t GetMsgObject = {
+  .Init = &Init;
+  .DeInit = &DeInit;
+  .Cyclic = &Cyclic;
+  .AddListener = &AddListener;
 };
-GetMsg_if_t *GetMsgObj = &GetMsgObject;
+GETMSG_GetMsg_if_t *GETMSG_GetMsgObj = &GetMsgObject;
 
 
-void GETMSG_Init(RingBuffer *rb);
-void GETMSG_DeInit(void);
-void GETMSG_Cyclic(void);
-GETMSG_ErrStatus_t GETMSG_AddListener(newMsgNotify *notifyFnc);
+static void Init(RingBuffer *rb);
+static void DeInit(void);
+static void Cyclic(void);
+static GETMSG_ErrStatus_t AddListener(newMsgNotify *notifyFnc);
 
 static GETMSG_ErrStatus_t CollectingBytes(RingBuffer *rb);
 static GETMSG_ErrStatus_t ValidateMsg(MsgNMEA_t *msg);
 
 
-void GETMSG_Init(RingBuffer *rb)
+void Init(RingBuffer *rb)
 {
   ringBuff = rb;
   status = INIT;
   msgParsingStatus = MSG_WAITING_FOR_BEGIN;
 
-  //todo: clean listeners table
-
+  GETMSG_ListenerObj->Init();
 }
 
 
-void GETMSG_DeInit()
+void DeInit()
 {
-
+  GETMSG_ListenerObj->DeInit();
 }
 
 
-void GETMSG_Cyclic()
+void Cyclic()
 {
   switch(status)
   {
@@ -94,7 +93,7 @@ void GETMSG_Cyclic()
       break;
 
     case RUN:
-      CollectingBytes(ringBuff);  // Check for faults returned.
+      CollectingBytes(ringBuff);  //todo Check for faults returned.
       break;
 
     case IDLE:
@@ -103,17 +102,17 @@ void GETMSG_Cyclic()
     default:
   }
 
-
 }
 
 
-GETMSG_ErrStatus_t GETMSG_AddListener(newMsgNotify *notifyFnc)
+GETMSG_ErrStatus_t AddListener(NewMsgNotify *notifyFnc)
 {
-	GETMSG_ErrStatus_t res = ERR_NOT_OK;
-  if
+  GETMSG_ErrStatus_t res = ERR_LISTENER_NOT_ADDED;
 
+  if (NULL == ) return;
+  res = GetMsgListenerObj->AddListener(notifyFnc);
 
-
+  return res;
 }
 
 
@@ -131,7 +130,7 @@ static GETMSG_ErrStatus_t CollectingBytes(RBuff_if_t *rb)
       while(TRUE != rb->IsBufferEmpty())
       {
         byte = rb->GetByte();
-        if (MSG_BEGIN != byte) continue;  // what about any timeout here, not necessary ?
+        if (GETMSG_MSG_BEGIN != byte) continue;  // what about any timeout here, not necessary ?
         msgData.buff[bufIdx] = byte;
         bufIdx++;
         msgData.length++;
@@ -147,12 +146,12 @@ static GETMSG_ErrStatus_t CollectingBytes(RBuff_if_t *rb)
         msgData.length++;
         bufIdx++;
 
-        if (MSG_END == byte)
+        if (GETMSG_MSG_END == byte)
         {
           msgParsingStatus = MSG_RECEIVED;
         };
 
-        if (bufIdx >= MSG_BUFFER_LENGHT && MSG_END != byte)  //replace sides, abd what about Msg end condition.
+        if (bufIdx >= MSG_BUFFER_LENGHT && GETMSG_MSG_END != byte)  //replace sides, abd what about Msg end condition.
         {
           // The buffer is full and there was not end of message sign received,
           // clear all data and start again from beginning.
