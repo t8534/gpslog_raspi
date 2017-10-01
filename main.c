@@ -36,7 +36,25 @@ int main(int argc, char **argv)
 #endif
 
 
-// serialRead test
+// serial winapi
+#include <stdio.h>
+
+int main(int argc, char **argv)
+{
+	printf("Start \n");
+	//flush();
+    // serial winapi
+    serialTest(void);
+	printf("Stop \n");
+
+	return 0;
+}
+
+
+
+// Raspi serialRead test
+#if 0
+
 #include <stdio.h>
 #include <string.h>
 #include <errno.h>
@@ -45,6 +63,7 @@ int main(int argc, char **argv)
 
 int main ()
 {
+
   int fd ;
   
   printf("Test: readSerial: \n");
@@ -65,7 +84,9 @@ int main ()
     printf (" -> %d \n", serialGetchar (fd)) ;
     fflush (stdout) ;
   }
+
 }
+#endif
 
 
 ////////////////////////////////////////////////
