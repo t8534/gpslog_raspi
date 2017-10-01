@@ -3,6 +3,11 @@
 #include "win_serial.h"
 
 
+// Below example is from pdf.
+// There is another good article:
+// https://www.codeproject.com/Articles/3061/Creating-a-Serial-communication-on-Win
+//
+
 
 // Error support
 /*
