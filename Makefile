@@ -148,7 +148,7 @@ position_logger:
 #		-o ${TESTS_BIN} ${FILES_LIST} -I../src/ -lm \ 
 #		`pkg-config --cflags --libs check` 
  
- 
+  
 clean: 
 	${RM} ${BUILD_DIR}/* 
 
