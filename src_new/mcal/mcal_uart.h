@@ -2,6 +2,7 @@
 #define MCAL_UART_H_
 
 #include <stdint.h>
+#include "utils/typedefs.h"  // todo: update
 
 
 #define HAL_CRITICAL_SECTION

@@ -2,6 +2,8 @@
 #define GETMSG_TESTS_H_
 
 #include <stdint.h>
+#include "typedefs.h"
+
 
 void GETMSG_test(void);
 

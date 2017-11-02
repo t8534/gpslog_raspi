@@ -1,5 +1,8 @@
 TODO:
 
+0.
+Use Strategy design pattern
+
 1.
 Add GetMessage module.
 It read data from Ring Buffer and collect NMEA message.

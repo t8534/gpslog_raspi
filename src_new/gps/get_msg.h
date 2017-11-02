@@ -2,6 +2,7 @@
 #define GET_MSG_H_
 
 #include <stdint.h>
+#include "typedefs.h"
 #include "get_msg_err.h"
 #include "get_msg_listeners.h"
 #include "ring_buff.h"

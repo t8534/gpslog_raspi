@@ -2,6 +2,7 @@
 #define PARSERS_MANAGER_H_
 
 #include <stdint.h>
+#include "typedefs.h"
 
 void GPS_ParsersManagerInit(void);
 void GPS_ParsersManagerDeInit(void);

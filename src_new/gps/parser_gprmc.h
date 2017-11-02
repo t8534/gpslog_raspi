@@ -2,6 +2,7 @@
 #define PARSER_GPRMC_H_
 
 #include <stdint.h>
+#include "typedefs.h"
 
 typedef struct {
 	nmea_s base;

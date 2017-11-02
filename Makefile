@@ -59,38 +59,38 @@
 
 
 ########################################################################
-# headers subdirs
-#IDIRS = -I. -I"C:/MinGW/include" -I"C:/MinGW/include/lib/gcc/mingw32/4.5.0/include" -I"C:/MinGW/include/lib/gcc/mingw32/4.5.0/include-fixed" -I./libs/sdl/include -I./libs/sdl/include/SDL
-IDIRS = -I./lib/include/SDL2 
-
-CC=gcc   
-CFLAGS=-c -v -Wall $(IDIRS) 
-
-#CXX=g++
-#CXXFLAGS=-c -Wall $(IDIRS) 
-
-LDFLAGS= 
-LDLIBS= -L./lib/libs -lmingw32 -lSDL2main -lSDL2
-
-
-%.o: %.c
-	$(CC) $(CFLAGS) $<
-
-
-# all source subdirs for linker and compilator
-#VPATH = ./ libs libs/sdl libs/sdl/libs
-
-all : t3_sdl2.exe
-
-# At linker below library paths and libraries must be at the end of line.
-t3_sdl2.exe : t3_sdl2.o   
-	$(CC) -o t3_sdl2.exe t3_sdl2.o $(LDLIBS)
-
-
-clean:
-	rm -f t3_sdl2.exe t3_sdl2.o
-
-
+## headers subdirs
+##IDIRS = -I. -I"C:/MinGW/include" -I"C:/MinGW/include/lib/gcc/mingw32/4.5.0/include" -I"C:/MinGW/include/lib/gcc/mingw32/4.5.0/include-fixed" -I./libs/sdl/include -I./libs/sdl/include/SDL
+#IDIRS = -I./lib/include/SDL2 
+#
+#CC=gcc   
+#CFLAGS=-c -v -Wall $(IDIRS) 
+#
+##CXX=g++
+##CXXFLAGS=-c -Wall $(IDIRS) 
+#
+#LDFLAGS= 
+#LDLIBS= -L./lib/libs -lmingw32 -lSDL2main -lSDL2
+#
+#
+#%.o: %.c
+#	$(CC) $(CFLAGS) $<
+#
+#
+## all source subdirs for linker and compilator
+##VPATH = ./ libs libs/sdl libs/sdl/libs
+#
+#all : t3_sdl2.exe
+#
+## At linker below library paths and libraries must be at the end of line.
+#t3_sdl2.exe : t3_sdl2.o   
+#	$(CC) -o t3_sdl2.exe t3_sdl2.o $(LDLIBS)
+#
+#
+#clean:
+#	rm -f t3_sdl2.exe t3_sdl2.o
+#
+#
 #####################################################################
 
 
@@ -105,28 +105,44 @@ clean:
 # 
 #clean: 
 #	rm -rf *o gps_test 
+
+PROJ_DIR=.
+SRC_DIR=./src_new
+BUILD_DIR=./build
+
  
-CC=/usr/bin/gcc 
+IDIRS = -I. -I${SRC_DIR}/sys -I${SRC_DIR}/gps -I${SRC_DIR}/mcal -I${SRC_DIR}/tests -I${SRC_DIR}/utils 
  
-RM=/bin/rm 
+CC=gcc 
  
-CFLAGS=-g3 -Wall -lm 
+RM=rm 
  
-PROJ_DIR=. 
-BUILD_DIR=./build 
+CFLAGS=-g3 -Wall ${IDIRS}
  
-OBJS =	${BUILD_DIR}/gps.o ${BUILD_DIR}/serial.o ${BUILD_DIR}/nmea.o ${BUILD_DIR}/position_logger.o 
+OBJS =	${BUILD_DIR}/mcal_uart.o ${BUILD_DIR}/ring_buff.o ${BUILD_DIR}/get_msg_listeners.o ${BUILD_DIR}/get_msg.o ${BUILD_DIR}/getmsg_tests.o ${BUILD_DIR}/position_logger.o 
  
 LIBS = -lm 
  
 all: position_logger 
  
+#position_logger: 
+#	${CC} ${CFLAGS} ${IDIRS} -c -o ${BUILD_DIR}/mcal_uart.o mcal_uart.c 
+#	${CC} ${CFLAGS} ${IDIRS} -c -o ${BUILD_DIR}/ring_buff.o ring_buff.c 
+#	${CC} ${CFLAGS} ${IDIRS} -c -o ${BUILD_DIR}/get_msg.o get_msg.c
+#	${CC} ${CFLAGS} ${IDIRS} -c -o ${BUILD_DIR}/get_msg_listeners.o get_msg_listeners.c	
+#	${CC} ${CFLAGS} ${IDIRS} -c -o ${BUILD_DIR}/getmsg_tests.o getmsg_tests.c	 
+#	${CC} ${CFLAGS} ${IDIRS} -c -o ${BUILD_DIR}/position_logger.o position_logger.c 
+#	${CC} ${CFLAGS} -o ${BUILD_DIR}/position_logger ${OBJS} ${LIBS} 
+ 
 position_logger: 
-	${CC} ${CFLAGS} -I${PROJ_DIR}/libgps -c -o ${BUILD_DIR}/gps.o gps.c 
-	${CC} ${CFLAGS} -I${PROJ_DIR}/libgps -c -o ${BUILD_DIR}/serial.o serial.c 
-	${CC} ${CFLAGS} -I${PROJ_DIR}/libgps -c -o ${BUILD_DIR}/nmea.o nmea.c 
-	${CC} ${CFLAGS} -I${PROJ_DIR} -c -o ${BUILD_DIR}/position_logger.o position_logger.c 
+	${CC} ${CFLAGS} -c -o ${BUILD_DIR}/ring_buff.o ${SRC_DIR}/utils/ring_buff.c
+	${CC} ${CFLAGS} -c -o ${BUILD_DIR}/mcal_uart.o ${SRC_DIR}/mcal/mcal_uart.c 
+	${CC} ${CFLAGS} -c -o ${BUILD_DIR}/get_msg.o ${SRC_DIR}/gps/get_msg.c
+	${CC} ${CFLAGS} -c -o ${BUILD_DIR}/get_msg_listeners.o ${SRC_DIR}/gps/get_msg_listeners.c	
+	${CC} ${CFLAGS} -c -o ${BUILD_DIR}/getmsg_tests.o ${SRC_DIR}/tests/getmsg_tests.c	 
+	${CC} ${CFLAGS} -c -o ${BUILD_DIR}/position_logger.o position_logger.c 
 	${CC} ${CFLAGS} -o ${BUILD_DIR}/position_logger ${OBJS} ${LIBS} 
+ 
  
  
 #Example 

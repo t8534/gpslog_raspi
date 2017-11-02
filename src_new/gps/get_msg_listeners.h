@@ -1,6 +1,7 @@
 #ifndef GET_MSG_LISTENERS_H_
 #define GET_MSG_LISTENERS_H_
 
+#include "typedefs.h"
 #include "get_msg_err.h"
 #include "get_msg.h"
 
