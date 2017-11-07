@@ -2,8 +2,7 @@
 #define GET_MSG_ERR_H_
 
 
-typedef enum
-{
+typedef enum {
   OK,
   ERR_NOT_OK,
   ERR_BUFFER_OVERLOADED,   //todo: overloaded information in this .h file.

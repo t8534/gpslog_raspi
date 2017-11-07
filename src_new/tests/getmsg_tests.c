@@ -1,3 +1,5 @@
+#include <stddef.h>
+#include <stdint.h>
 
 #include "getmsg_tests.h"
 #include "get_msg.h"

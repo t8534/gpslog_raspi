@@ -7,65 +7,64 @@
 //
 
 #include <stdint.h>
-#include "get_msg_listener.h"
+#include <stddef.h>
+#include "src_new/gps/get_msg_listeners.h"
 
 
-typedef void (*NewMsgNotify)(MsgNMEA_t*);
-
-
-static void Init(void);
-static void DeInit(void);
-static void AddListener(NewMsgNotify* f);
-static void SendNotify(MsgNMEA_t *msg);
+//todo: what about static functions
+void GETMSGLISTN_Init(void);
+void GETMSGLISTN_DeInit(void);
+GETMSG_ErrStatus_t GETMSGLISTN_AddListener(NewMsgNotify* f);
+void GETMSGLISTN_SendNotify(MsgNMEA_t *msg);
 
 
 static GETMSG_Listener_if_t ListenerObject = {
-  .Init = &Init;
-  .DeInit = &DeInit;
-  .AddListener = &AddListener;
-  .SendNotify = &SendNotify;
+  .Init = &GETMSGLISTN_Init,
+  .DeInit = &GETMSGLISTN_DeInit,
+  .AddListener = &GETMSGLISTN_AddListener,
+  .SendNotify = &GETMSGLISTN_SendNotify,
 };
 GETMSG_Listener_if_t *GETMSG_ListenerObj = &ListenerObject;
 
 
-#define GETMSG_LISTENERS_AMOUNT  2
+#define GETMSG_LISTENERS_NUMBER  2
 static NewMsgNotify listeners[GETMSG_LISTENERS_NUMBER];
 
 
-static void Init(void)
+void GETMSGLISTN_Init(void)
 {
   uint16_t i = 0;
 
-  for(i = 0; i < GETMSG_LISTENERS_AMOUNT; i++)
+  for(i = 0; i < GETMSG_LISTENERS_NUMBER; i++)
   {
 	  listeners[i] = NULL;
   }
 }
 
 
-static void DeInit(void)
+void GETMSGLISTN_DeInit(void)
 {
   uint16_t i = 0;
 
-  for(i = 0; i < GETMSG_LISTENERS_AMOUNT; i++)
+  for(i = 0; i < GETMSG_LISTENERS_NUMBER; i++)
   {
 	  listeners[i] = NULL;
   }
 }
 
 
-static GETMSG_ErrStatus_t AddListener(NewMsgNotify* f)
+GETMSG_ErrStatus_t GETMSGLISTN_AddListener(NewMsgNotify* f)
 {
   GETMSG_ErrStatus_t res = ERR_LISTENER_NOT_ADDED;
   uint16_t i = 0;
 
-  if (NULL == f) return;
+  if (NULL == f) return res;
 
-  for(i = 0; i < GETMSG_LISTENERS_AMOUNT; i++)
+  for(i = 0; i < GETMSG_LISTENERS_NUMBER; i++)
   {
     if (NULL == listeners[i])
     {
-      listeners[i] = NewMsgNotify;
+      listeners[i] = f;
       res = OK;
     }
   }
@@ -74,11 +73,11 @@ static GETMSG_ErrStatus_t AddListener(NewMsgNotify* f)
 }
 
 
-static void SendNotify(MsgNMEA_t *msg)
+void GETMSGLISTN_SendNotify(MsgNMEA_t *msg)
 {
   uint16_t i = 0;
 
-  for(i = 0; i < GETMSG_LISTENERS_AMOUNT; i++)
+  for(i = 0; i < GETMSG_LISTENERS_NUMBER; i++)
   {
 	if (NULL != listeners[i])
 	{

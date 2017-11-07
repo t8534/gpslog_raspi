@@ -13,8 +13,10 @@
 //
 //
 
+#include <stddef.h>
 #include "get_msg.h"
-#include "get_msg_listeners.h"
+#include "src_new/gps/get_msg_listeners.h"
+//#include "get_msg_listeners.h"
 
 
 #define GETMSG_MSG_BEGIN  '$'   // 0x24
@@ -42,8 +44,15 @@ static GETMSG_Status_t status = IDLE;
 static GETMSG_MsgReceivingState_t msgParsingStatus = MSG_WAITING_FOR_BEGIN;
 MsgNMEA_t msgData;  //todo Is it static or/and pointer
 
-static RingBuffer *ringBuff;
+static RBuff_if_t *ringBuff;
 
+void GETMSG_Init(RBuff_if_t *rb);
+void GETMSG_DeInit(void);
+void GETMSG_Cyclic(void);
+GETMSG_ErrStatus_t GETMSG_AddListener(NewMsgNotify *notifyFnc);
+
+GETMSG_ErrStatus_t GETMSG_CollectingBytes(RBuff_if_t *rb);
+GETMSG_ErrStatus_t GETMSG_ValidateMsg(MsgNMEA_t *msg);
 
 
 //todo: is functions below could be static ? So, in general is it possible
@@ -52,24 +61,15 @@ static RingBuffer *ringBuff;
 //todo: is it possible to have static variable, and global pointer to her,
 //      and have an access via pointer ?
 GETMSG_GetMsg_if_t GetMsgObject = {
-  .Init = &Init;
-  .DeInit = &DeInit;
-  .Cyclic = &Cyclic;
-  .AddListener = &AddListener;
+  .Init = &GETMSG_Init,
+  .DeInit = &GETMSG_DeInit,
+  .Cyclic = &GETMSG_Cyclic,
+  .AddListener = &GETMSG_AddListener,
 };
 GETMSG_GetMsg_if_t *GETMSG_GetMsgObj = &GetMsgObject;
 
 
-static void Init(RingBuffer *rb);
-static void DeInit(void);
-static void Cyclic(void);
-static GETMSG_ErrStatus_t AddListener(newMsgNotify *notifyFnc);
-
-static GETMSG_ErrStatus_t CollectingBytes(RingBuffer *rb);
-static GETMSG_ErrStatus_t ValidateMsg(MsgNMEA_t *msg);
-
-
-void Init(RingBuffer *rb)
+void GETMSG_Init(RBuff_if_t *rb)
 {
   ringBuff = rb;
   status = INIT;
@@ -79,13 +79,13 @@ void Init(RingBuffer *rb)
 }
 
 
-void DeInit()
+void GETMSG_DeInit()
 {
   GETMSG_ListenerObj->DeInit();
 }
 
 
-void Cyclic()
+void GETMSG_Cyclic()
 {
   switch(status)
   {
@@ -93,24 +93,26 @@ void Cyclic()
       break;
 
     case RUN:
-      CollectingBytes(ringBuff);  //todo Check for faults returned.
+      GETMSG_CollectingBytes(ringBuff);  //todo Check for faults returned.
       break;
 
     case IDLE:
       break;
 
     default:
+    	break;
+
   }
 
 }
 
 
-GETMSG_ErrStatus_t AddListener(NewMsgNotify *notifyFnc)
+GETMSG_ErrStatus_t GETMSG_AddListener(NewMsgNotify *notifyFnc)
 {
   GETMSG_ErrStatus_t res = ERR_LISTENER_NOT_ADDED;
 
-  if (NULL == ) return;
-  res = GetMsgListenerObj->AddListener(notifyFnc);
+  if (NULL == notifyFnc) return res;
+  res = GETMSG_ListenerObj->AddListener(notifyFnc);
 
   return res;
 }
@@ -118,11 +120,12 @@ GETMSG_ErrStatus_t AddListener(NewMsgNotify *notifyFnc)
 
 
 // Called periodically from GETMSG_Cyclic()
-static GETMSG_ErrStatus_t CollectingBytes(RBuff_if_t *rb)
+GETMSG_ErrStatus_t GETMSG_CollectingBytes(RBuff_if_t *rb)
 {
   uint8_t byte = 0;
+  uint16_t i = 0;
   static uint16_t bufIdx = 0;
-  ErrStatus_t res = OK;
+  GETMSG_ErrStatus_t res = OK;
 
   switch(msgParsingStatus)
   {
@@ -155,7 +158,7 @@ static GETMSG_ErrStatus_t CollectingBytes(RBuff_if_t *rb)
         {
           // The buffer is full and there was not end of message sign received,
           // clear all data and start again from beginning.
-          for (bufIdx = 0; bufIdx < MSG_BUFFER_LENGHT)
+          for (bufIdx = 0; bufIdx < MSG_BUFFER_LENGHT; bufIdx++)
           {
             msgData.buff[bufIdx] = 0;
           }
@@ -170,12 +173,14 @@ static GETMSG_ErrStatus_t CollectingBytes(RBuff_if_t *rb)
 
     case MSG_RECEIVED:
         // push message outside (should it be buffered anywhere outside ?), clear buffer, set states to init.
-        for (i = 0; i < LISTENERS_AMOUNT)
+    	//todo redesing ! GETMSG_LISTENERS_NUMBER is not, and cannot be available here
+#if 0
+        for (i = 0; i < GETMSG_LISTENERS_NUMBER; i++)  //todo GETMSG_LISTENERS_NUMBER defined at listeners break OpenClose principle,
         {
           (*newMsgNotify[i])(msgData);
         }
-
-        for (bufIdx = 0; bufIdx < MSG_BUFFER_LENGHT)
+#endif
+        for (bufIdx = 0; bufIdx < MSG_BUFFER_LENGHT; bufIdx++)
         {
           msgData.buff[bufIdx] = 0;
         }
@@ -195,7 +200,7 @@ static GETMSG_ErrStatus_t CollectingBytes(RBuff_if_t *rb)
 }
 
 
-static GETMSG_ErrStatus_t ValidateMsg(MsgNMEA_t* msg)
+GETMSG_ErrStatus_t GETMSG_ValidateMsg(MsgNMEA_t* msg)
 {
 	GETMSG_ErrStatus_t res = OK;
 

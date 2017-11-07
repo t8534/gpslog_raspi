@@ -4,7 +4,7 @@
 #include <stdint.h>
 #include "typedefs.h"
 #include "get_msg_err.h"
-#include "get_msg_listeners.h"
+//#include "get_msg_listeners.h"
 #include "ring_buff.h"
 
 
@@ -14,13 +14,14 @@ typedef struct {
   uint16_t length;
 } MsgNMEA_t;
 
+typedef void (*NewMsgNotify)(MsgNMEA_t*);
 
 typedef struct
 {
   void (*Init)(RBuff_if_t *rb);
   void (*DeInit)(void);
   void (*Cyclic)(void);
-  GETMSG_ErrStatus_t (*AddListener)(newMsgNotify);
+  GETMSG_ErrStatus_t (*AddListener)(NewMsgNotify);
 } GETMSG_GetMsg_if_t;
 
 extern GETMSG_GetMsg_if_t *GETMSG_GetMsgObj;

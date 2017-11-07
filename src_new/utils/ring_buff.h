@@ -2,7 +2,7 @@
 #define RING_BUFF_H_
 
 #include <stdint.h>
-#include "sys/typedefs.h"
+#include "src_new/sys/typedefs.h"  //todo
 
 //TODO: It should be optimized to use many RingBuffers, OOP.
 

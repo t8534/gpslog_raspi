@@ -1,9 +1,10 @@
 #ifndef GET_MSG_LISTENERS_H_
 #define GET_MSG_LISTENERS_H_
 
-#include "typedefs.h"
-#include "get_msg_err.h"
-#include "get_msg.h"
+#include "src_new/sys/typedefs.h"
+#include "src_new/gps/get_msg_err.h"
+#include "src_new/gps/get_msg.h"
+
 
 typedef void (*Init)(void);
 typedef void (*DeInit)(void);
