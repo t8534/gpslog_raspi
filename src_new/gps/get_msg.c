@@ -4,6 +4,7 @@
 // 1.
 
 // Add kind of interface for input from ring buffer.
+
 // It could be struct represent interface, and than you can call a function from inside.
 // It safe encapsulation if a function name will be changed inside of ring buffer module.
 //
@@ -11,6 +12,9 @@
 // Add interface by vritual table when you read functions from listener.
 // It safe encapsulation if a function name will be changed inside of listener module.
 //
+// 3.
+// Why the same name of i.e. "Init" cannot be used in get_msg and get_msg_listeners even
+// if they are static ?
 //
 
 #include <stddef.h>
