@@ -182,5 +182,6 @@ position_logger:
  
  
 clean: 
-	${RM} ${BUILD_DIR}/* 
+	${RM} ${BUILD_DIR}/*.o 
+
 

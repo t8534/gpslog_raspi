@@ -53,7 +53,7 @@ static RBuff_if_t *ringBuff;
 void GETMSG_Init(RBuff_if_t *rb);
 void GETMSG_DeInit(void);
 void GETMSG_Cyclic(void);
-GETMSG_ErrStatus_t GETMSG_AddListener(NewMsgNotify *notifyFnc);
+GETMSG_ErrStatus_t GETMSG_AddListener(NewMsgNotify notifyFnc);
 
 GETMSG_ErrStatus_t GETMSG_CollectingBytes(RBuff_if_t *rb);
 GETMSG_ErrStatus_t GETMSG_ValidateMsg(MsgNMEA_t *msg);
@@ -94,6 +94,7 @@ void GETMSG_Cyclic()
   switch(status)
   {
     case INIT:
+      status = RUN;
       break;
 
     case RUN:
@@ -111,7 +112,7 @@ void GETMSG_Cyclic()
 }
 
 
-GETMSG_ErrStatus_t GETMSG_AddListener(NewMsgNotify *notifyFnc)
+GETMSG_ErrStatus_t GETMSG_AddListener(NewMsgNotify notifyFnc)
 {
   GETMSG_ErrStatus_t res = ERR_LISTENER_NOT_ADDED;
 
@@ -127,7 +128,7 @@ GETMSG_ErrStatus_t GETMSG_AddListener(NewMsgNotify *notifyFnc)
 GETMSG_ErrStatus_t GETMSG_CollectingBytes(RBuff_if_t *rb)
 {
   uint8_t byte = 0;
-  uint16_t i = 0;
+  //uint16_t i = 0;
   static uint16_t bufIdx = 0;
   GETMSG_ErrStatus_t res = OK;
 

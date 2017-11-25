@@ -1,5 +1,6 @@
 #include <stddef.h>
 #include <stdint.h>
+#include <stdio.h>
 
 #include "getmsg_tests.h"
 #include "get_msg.h"
@@ -59,6 +60,7 @@ static char sentence1[] = "$GPGLL,4916.45,N,12311.12,W,225444,A\n\n";
 /////////////////////////////////////////////////////////////////////
 // Ring buffer test implementation
 /////////////////////////////////////////////////////////////////////
+/*
 typedef struct
 {
   void (*Init)(void);
@@ -69,31 +71,32 @@ typedef struct
   bool_t (*IsBufferFull)(void);
   void (*ClearBuffer)(void);
 } RBuff_if_t;
+*/
 
 static uint8_t TestRBuffGetByte();
 static bool_t TestRBuffIsBufferEmpty();
 static void TestRBuffClearBuffer();
 
 RBuff_if_t TestRingBuffer = {
-  .Init = NULL;
-  .DeInit = NULL;
-  .GetByte = &TestRBuffGetByte;
-  .PutByte = NULL;
-  .IsBufferEmpty = &TestRBuffIsBufferEmpty;
-  .IsBufferFull = NULL;
-  .ClearBuffer = &TestRBuffClearBuffer;
+  .Init = NULL,
+  .DeInit = NULL,
+  .GetByte = &TestRBuffGetByte,
+  .PutByte = NULL,
+  .IsBufferEmpty = &TestRBuffIsBufferEmpty,
+  .IsBufferFull = NULL,
+  .ClearBuffer = &TestRBuffClearBuffer,
 };
 
 RBuff_if_t *TestRingBuffObj = &TestRingBuffer;
 
 #define TEST_GETMSG_BUFFER_LEN  1024
-static buffer[TEST_GETMSG_BUFFER_LEN]
-static buffIdx = 0;
+static uint8_t buffer[TEST_GETMSG_BUFFER_LEN];
+static uint16_t buffIdx = 0;
 
 
 static uint8_t TestRBuffGetByte()
 {
-  return res = 0;
+  uint8_t res = 0;
 
 
   if (buffIdx < TEST_GETMSG_BUFFER_LEN)
@@ -141,7 +144,7 @@ void newMsgNotify(MsgNMEA_t *msg)
 	for (i = 0; i < len; i++)
 	{
 		c = msg->buff[i];
-		printf("buff[%d] = %x - %c \n", c, c);
+		printf("buff[%d] = %x - %c \n", i, c, c);
 	}
 	printf("NMEA stop \n");
 }
@@ -156,8 +159,16 @@ void GETMSG_test()
 
 
 	GETMSG_GetMsgObj->Init(TestRingBuffObj);
-    res = GETMSG_GetMsgObj->AddListener(newMsgNotify);
-    if (OK != res)
+
+	// todo: how to put the newMsgNotify as a pointer if there is also parameter for them ?
+	//https://stackoverflow.com/questions/1789807/function-pointer-as-an-argument
+	NewMsgNotify fnc = newMsgNotify;
+
+
+    //res = GETMSG_GetMsgObj->AddListener(newMsgNotify);
+	res = GETMSG_GetMsgObj->AddListener(fnc);
+
+	if (OK != res)
     {
     	printf("Error: not OK, GETMSG_GetMsgObj->AddListener(newMsgNotify) \n");
     	return;

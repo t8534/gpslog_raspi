@@ -15,7 +15,7 @@ typedef struct
 {
   void (*Init)(void);
   void (*DeInit)(void);
-  GETMSG_ErrStatus_t (*AddListener)(NewMsgNotify* f);
+  GETMSG_ErrStatus_t (*AddListener)(NewMsgNotify f);
   void (*SendNotify)(MsgNMEA_t *msg);
 } GETMSG_Listener_if_t;
 

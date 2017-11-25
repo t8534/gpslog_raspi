@@ -14,7 +14,7 @@
 //todo: what about static functions
 void GETMSGLISTN_Init(void);
 void GETMSGLISTN_DeInit(void);
-GETMSG_ErrStatus_t GETMSGLISTN_AddListener(NewMsgNotify* f);
+GETMSG_ErrStatus_t GETMSGLISTN_AddListener(NewMsgNotify f);
 void GETMSGLISTN_SendNotify(MsgNMEA_t *msg);
 
 
@@ -53,7 +53,7 @@ void GETMSGLISTN_DeInit(void)
 }
 
 
-GETMSG_ErrStatus_t GETMSGLISTN_AddListener(NewMsgNotify* f)
+GETMSG_ErrStatus_t GETMSGLISTN_AddListener(NewMsgNotify f)
 {
   GETMSG_ErrStatus_t res = ERR_LISTENER_NOT_ADDED;
   uint16_t i = 0;
